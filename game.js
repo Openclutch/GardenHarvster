@@ -11,6 +11,7 @@
     return `${CURRENCY_SYMBOL}${safeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
   const REPAIR_COST = 10; // cents
+  const PASSIVE_INCOME_DEFAULT = Object.freeze({ amount: 100, intervalMs: 500 });
   const DEFAULT_SEED = 'candy';
   // PETS (one active perk per player)
   const PETS = [
@@ -111,7 +112,37 @@
     activeEvent:null, eventUntil:0,
     // Center challenge
     challenge:null,
+    passiveIncome: { ...PASSIVE_INCOME_DEFAULT },
   };
+
+  const MIN_PASSIVE_INTERVAL = 100;
+  function sanitizePassiveIncome(config) {
+    const cfg = config || {};
+    const rawAmount = Number(cfg.amount);
+    const rawInterval = Number(cfg.intervalMs);
+    const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? Math.floor(rawAmount) : PASSIVE_INCOME_DEFAULT.amount;
+    const intervalMs = Number.isFinite(rawInterval) && rawInterval >= MIN_PASSIVE_INTERVAL
+      ? Math.floor(rawInterval)
+      : PASSIVE_INCOME_DEFAULT.intervalMs;
+    return { amount, intervalMs };
+  }
+
+  let passiveIncomeTimer = null;
+  function restartPassiveIncomeTimer() {
+    if (passiveIncomeTimer) clearInterval(passiveIncomeTimer);
+    const { amount, intervalMs } = state.passiveIncome;
+    if (!(amount > 0) || !(intervalMs >= MIN_PASSIVE_INTERVAL)) return;
+    passiveIncomeTimer = setInterval(() => applyPassiveIncome(amount), intervalMs);
+  }
+
+  function applyPassiveIncome(amount) {
+    const payout = Number(amount);
+    if (!Number.isFinite(payout) || payout <= 0) return;
+    state.p1.money = (state.p1.money ?? 0) + payout;
+    if (state.p2Active) {
+      state.p2.money = (state.p2.money ?? 0) + payout;
+    }
+  }
 
   // ---------- SAVE/LOAD ----------
   function migrateLegacy(){
@@ -127,6 +158,7 @@
     state.plots = Array.isArray(saved.plots) ? saved.plots : state.plots;
     Object.assign(state.p1, saved.p1 || {});
     Object.assign(state.p2, saved.p2 || {});
+    state.passiveIncome = sanitizePassiveIncome(saved.passiveIncome ?? state.passiveIncome);
     state.p1.pet = null;
     state.p2.pet = null;
     state.p1.pets = [];
@@ -171,6 +203,7 @@
       plots: state.plots,
       p1: { money:state.p1.money, invSeeds:state.p1.invSeeds, bag:state.p1.bag, selected:state.p1.selected },
       p2: { money:state.p2.money, invSeeds:state.p2.invSeeds, bag:state.p2.bag, selected:state.p2.selected },
+      passiveIncome: state.passiveIncome,
     }));
     console.log('Saving game state', minimal);
     localStorage.setItem(SAVE_KEY, JSON.stringify(minimal));
@@ -2087,5 +2120,6 @@
     startingP2: state.p2,
     p2Active: state.p2Active,
   });
+  restartPassiveIncomeTimer();
   tick();
 })();
