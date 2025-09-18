@@ -8,10 +8,12 @@
     html, body { height: 100%; margin: 0; overflow:hidden; background:#dfeee3; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
     #wrap { display:flex; flex-direction:column; height:100%; }
     header { background:#20303c; color:#fff; padding:8px 12px; font-weight:600; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    header .status-group { display:flex; flex-wrap:wrap; gap:8px; }
     header .pill { background:#2f4656; padding:4px 8px; border-radius:999px; font-weight:600; }
-    header .hint { opacity:.9; font-weight:400; }
+    header .hint { opacity:.85; font-weight:500; flex-basis:100%; font-size:14px; }
     header button { border:1px solid #1a2730; background:#2f4656; color:#e8f6ff; border-radius:999px; padding:4px 10px; cursor:pointer; }
-    header .savebar { display:flex; gap:8px; align-items:center; margin-left:auto; }
+    header .actions { display:flex; gap:8px; align-items:center; margin-left:auto; flex-wrap:wrap; }
+    header .savebar { display:flex; gap:8px; align-items:center; }
     header .savebar input[type=file]{ display:none; }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
@@ -62,21 +64,25 @@
 <body>
 <div id="wrap">
   <header>
-    <div class="pill" id="p1money">P1 Money: ¢0.00</div>
-    <div class="pill p2" id="p2money">P2 Money: ¢0.00</div>
-    <div class="pill" id="p1hud">P1 Seeds: — | Bag: —</div>
-    <div class="pill p2" id="p2hud">P2 Seeds: — | Bag: —</div>
-    <button id="toggleEvents" title="Toggle Events (H)">Events</button>
-    <div class="savebar">
-      <button id="btnSave" title="Save to browser (Autosaves too)">Save</button>
-      <button id="btnLoad" title="Load from browser">Load</button>
-      <button id="btnExport" title="Download save file">Export</button>
-      <button id="btnImport" title="Import save file">Import</button>
-      <label for="fileImport" class="sr-only">Import save file</label>
-      <input id="fileImport" type="file" accept="application/json" title="Import save file" />
-      <button id="addP2" title="Enable second player">Add Player 2</button>
+    <div class="status-group">
+      <div class="pill" id="p1money">P1 Money: ¢0.00</div>
+      <div class="pill p2" id="p2money">P2 Money: ¢0.00</div>
+      <div class="pill" id="p1hud">P1 Seeds: — | Bag: —</div>
+      <div class="pill p2" id="p2hud">P2 Seeds: — | Bag: —</div>
     </div>
-    <div class="hint">Growth persists via timestamps. Rotten plants must be <b>fixed</b> by the plot owner for ¢10.00. A random <b>Center Challenge</b> can grant pets with perks.</div>
+    <div class="actions">
+      <button id="toggleEvents" title="Toggle Events (H)">Events</button>
+      <div class="savebar">
+        <button id="btnSave" title="Save to browser (Autosaves too)">Save</button>
+        <button id="btnLoad" title="Load from browser">Load</button>
+        <button id="btnExport" title="Download save file">Export</button>
+        <button id="btnImport" title="Import save file">Import</button>
+        <label for="fileImport" class="sr-only">Import save file</label>
+        <input id="fileImport" type="file" accept="application/json" title="Import save file" />
+        <button id="addP2" title="Enable second player">Add Player 2</button>
+      </div>
+    </div>
+    <div class="hint">The garden keeps growing while you're offline.</div>
   </header>
   <div id="gameArea">
     <canvas id="game" width="1280" height="720"></canvas>
